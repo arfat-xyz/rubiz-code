@@ -6,7 +6,7 @@ import { tabValueProps } from "@/utils/interface";
 import { tabsArr } from "@/utils/constants";
 
 const HomePageClientComponent = () => {
-  const [activeTab, setActiveTab] = useState<tabValueProps>(tabsArr[0].value);
+  const [activeTab, setActiveTab] = useState<tabValueProps>(tabsArr[1].value);
   return (
     <div className="mx-auto max-w-full lg:max-w-screen-lg">
       {/* tabs */}
@@ -15,7 +15,7 @@ const HomePageClientComponent = () => {
           <div
             onClick={() => setActiveTab(t.value)}
             key={t.value}
-            className={`border-b   py-2 font-semibold cursor-pointer ${
+            className={`border-b   py-2 font-semibold cursor-pointer transition-colors duration-300 ${
               activeTab === t.value
                 ? "border-red-400 text-red-400"
                 : "border-gray-400"

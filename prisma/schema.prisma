@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model RubizCodeFile {
+  id   String @id @default(cuid()) @map("_id")
+  name String
+  size Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
