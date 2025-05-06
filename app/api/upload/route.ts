@@ -94,12 +94,14 @@ export async function POST(request: Request) {
     // Store the vector (you may need to adjust this to fit your logic)
     const uploadedToVector = await vectorDBstore(body.pdfFile, data.id);
     if (uploadedToVector.length < 1) {
-      await db.rubizCodeFile.delete({
+      const deltededFile = await db.rubizCodeFile.delete({
         where: { id: data.id },
       });
+      console.log(`File is deleted`, { deltededFile });
       return formatErrorResponse("File not uploaded to vector store", 401);
+    } else {
+      return formatResponse(data, "Uploaded completed successfully", 200);
     }
-    return formatResponse(data, "Uploaded completed successfully", 200);
   } catch (error) {
     // If there's an error, handle it using routeErrorHandler
     return routeErrorHandler(error);
