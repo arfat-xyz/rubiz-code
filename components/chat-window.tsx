@@ -2,6 +2,7 @@
 import { SingleConversationProps } from "@/utils/interface";
 import { useConversationStore } from "@/utils/use-conversation-zustand";
 import React, { useState, useRef, useEffect } from "react";
+import ReactRemarkdownDataVisualComponent from "./react-markdown-data-visual-component";
 
 const ChatWindow = () => {
   const [allConversations, setAllConversations] = useState<
@@ -154,7 +155,7 @@ const ChatWindow = () => {
                     isHuman ? "self-end" : "self-start"
                   }`}
                 >
-                  {query}
+                  <ReactRemarkdownDataVisualComponent context={query} />
                 </div>
               );
             })}
