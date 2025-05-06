@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
  * @param request - The incoming request object.
  * @returns A formatted response or error.
  */
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const allFiles = await db.rubizCodeFile
       .findMany({
