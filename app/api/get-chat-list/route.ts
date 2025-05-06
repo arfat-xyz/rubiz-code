@@ -1,13 +1,13 @@
 import { formatResponse, routeErrorHandler } from "@/lib/api-response-handler";
 import { db } from "@/lib/db";
 import { formatFileSize } from "@/utils/utils-functions";
-
+export const dynamic = "force-dynamic";
 /**
  * Handles a POST request.
  * @param request - The incoming request object.
  * @returns A formatted response or error.
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const allFiles = await db.rubizCodeFile
       .findMany({
