@@ -7,6 +7,9 @@ import { createIdFilterRetriever, promptTemplate } from "@/lib/google-get-ai";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { z } from "zod";
 
+// Force Node.js runtime for this route
+// export const runtime = "edge"; // 'nodejs' (default) | 'edge'
+
 const SingleConversationSchema = z.object({
   message: z.string().min(1, "Message cannot be empty"),
   conversationId: z.string().min(1, "Conversation ID cannot be empty"),
@@ -86,5 +89,3 @@ export async function POST(request: Request) {
     return routeErrorHandler(error);
   }
 }
-
-export const runtime = "edge";

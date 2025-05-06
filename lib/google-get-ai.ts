@@ -1,6 +1,5 @@
 import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { TaskType } from "@google/generative-ai";
 import {
   ChatGoogleGenerativeAI,
@@ -8,7 +7,6 @@ import {
 } from "@langchain/google-genai";
 import { CharacterTextSplitter } from "@langchain/textsplitters";
 import { createClient } from "@supabase/supabase-js";
-import { Document } from "langchain/document";
 
 // Initialize Google Generative AI Embeddings
 export const embeddings = new GoogleGenerativeAIEmbeddings({
@@ -17,7 +15,7 @@ export const embeddings = new GoogleGenerativeAIEmbeddings({
   title: "Document title",
 });
 
-const textSplitter = new CharacterTextSplitter({
+export const textSplitter = new CharacterTextSplitter({
   chunkSize: 400,
   chunkOverlap: 80,
 });
@@ -52,6 +50,7 @@ export const systemPrompt = `You are an AI chatbot designed to respond to user q
 3. If the context does not provide adequate information to address the input query, return the following response: "Sorry, I don’t know."  
 4. Ensure that the response is clear, concise, and directly addresses the input while remaining aligned with the context.  
 5. Maintain a neutral tone and avoid personal opinions or irrelevant information in the response.
+6. Please response geetings type input and then response what user want to know about your context.
 
 `;
 
@@ -83,47 +82,6 @@ export const promptTemplate = ChatPromptTemplate.fromMessages([
 // };
 export const createIdFilterRetriever = async (id: string, input: string) => {
   return await vectorStore.similaritySearch(input, 2, { id });
-};
-
-// Function to embed text and upload to Supabase
-export const vectorDBstore = async (file: File, id: string) => {
-  // Initialize the text splitter for markdown
-  const loader = new PDFLoader(file);
-
-  // Split the input text into documents
-  const docOutput = await loader.load();
-  const docOutputSplitted = await textSplitter.splitDocuments(docOutput);
-  // Collect all documents in a single array
-  const allDocuments: Document[] = [];
-
-  // Process each document
-  for (const doc of docOutputSplitted) {
-    const { metadata, pageContent } = doc; // Use `pageContent` for the text content
-
-    // Generate embeddings for each chunk and create Document objects
-    allDocuments.push(
-      new Document({
-        pageContent: pageContent, // The text content of the chunk
-        metadata: { ...metadata, id: id }, // Metadata including the id
-      })
-    );
-  }
-
-  // Creating supabase client
-  const supabaseClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-  );
-  // Vector store
-  const vectorStore = new SupabaseVectorStore(embeddings, {
-    client: supabaseClient,
-    tableName: process.env.NEXT_PUBLIC_SUPABASE_TABLE_NAME,
-    queryName: process.env.NEXT_PUBLIC_SUPABASE_QUERY_NAME,
-  });
-
-  // Add all documents to the vector store at once
-  const response = await vectorStore.addDocuments(allDocuments);
-  return response;
 };
 
 // Function to delete data by metadata

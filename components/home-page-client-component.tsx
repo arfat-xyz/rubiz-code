@@ -6,7 +6,7 @@ import { tabValueProps } from "@/utils/interface";
 import { tabsArr } from "@/utils/constants";
 
 const HomePageClientComponent = () => {
-  const [activeTab, setActiveTab] = useState<tabValueProps>(tabsArr[1].value);
+  const [activeTab, setActiveTab] = useState<tabValueProps>(tabsArr[0].value);
   return (
     <div className="mx-auto max-w-full lg:max-w-screen-lg">
       {/* tabs */}
