@@ -17,7 +17,6 @@ export async function POST(request: Request) {
     const json = await request.json();
     const { conversationId, message } = SingleConversationSchema.parse(json);
 
-    // Check if file exists
     const fileExist = await db.rubizCodeFile.count({
       where: { id: conversationId },
     });
@@ -26,11 +25,9 @@ export async function POST(request: Request) {
       return formatErrorResponse("File not found", 404);
     }
 
-    // Create a transform stream for the response
     const stream = new TransformStream();
     const writer = stream.writable.getWriter();
 
-    // Process the stream in the background
     (async () => {
       try {
         const data = await createIdFilterRetriever(conversationId, message);
@@ -50,7 +47,6 @@ export async function POST(request: Request) {
 
         const llmStream = await streamingLlm.stream(prompt);
 
-        // Write each chunk to the stream
         for await (const chunk of llmStream) {
           const content = chunk.content;
           if (typeof content === "string") {
@@ -62,16 +58,14 @@ export async function POST(request: Request) {
           }
         }
 
-        // Signal completion
         await writer.write(new TextEncoder().encode(`data: [DONE]\n\n`));
       } catch (error) {
         console.error("Stream error:", error);
         await writer.write(
           new TextEncoder().encode(
             `data: ${JSON.stringify({
-              error: (error as Error)?.message
-                ? (error as Error)?.message
-                : "Something went wrong",
+              error:
+                error instanceof Error ? error.message : "Something went wrong",
             })}\n\n`
           )
         );
@@ -80,7 +74,6 @@ export async function POST(request: Request) {
       }
     })();
 
-    // Return the readable stream
     return new Response(stream.readable, {
       headers: {
         "Content-Type": "text/event-stream",
@@ -93,3 +86,5 @@ export async function POST(request: Request) {
     return routeErrorHandler(error);
   }
 }
+
+export const runtime = "edge";
