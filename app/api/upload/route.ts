@@ -25,30 +25,36 @@ const postSchema = z.object({
  */
 export async function POST(request: Request) {
   try {
-    const transaction = await db.$transaction(async (prisma) => {
-      const formData = await request.formData();
-      const jsonData = Object.fromEntries(formData.entries());
-      const body = postSchema.parse({
-        pdfFile: jsonData.pdfFile,
-      });
+    const transaction = await db.$transaction(
+      async (prisma) => {
+        const formData = await request.formData();
+        const jsonData = Object.fromEntries(formData.entries());
+        const body = postSchema.parse({
+          pdfFile: jsonData.pdfFile,
+        });
 
-      // Start transaction: Create the entry in rubizCodeFile
-      const data = await prisma.rubizCodeFile.create({
-        data: {
-          name: body.pdfFile.name,
-          size: body.pdfFile.size,
-        },
-      });
+        // Start transaction: Create the entry in rubizCodeFile
+        const data = await prisma.rubizCodeFile.create({
+          data: {
+            name: body.pdfFile.name,
+            size: body.pdfFile.size,
+          },
+        });
 
-      // Store the vector (you may need to adjust this to fit your logic)
-      const uploadedToVector = await vectorDBstore(body.pdfFile, data.id);
-      if (uploadedToVector.length < 1) {
-        throw new ApiError(401, "For some reson file not uploaded");
+        // Store the vector (you may need to adjust this to fit your logic)
+        const uploadedToVector = await vectorDBstore(body.pdfFile, data.id);
+        if (uploadedToVector.length < 1) {
+          throw new ApiError(401, "For some reson file not uploaded");
+        }
+
+        // If everything is successful, return the successful response
+        return formatResponse(data, "PDF uploaded successfully");
+      },
+      {
+        maxWait: 20000,
+        timeout: 50000,
       }
-
-      // If everything is successful, return the successful response
-      return formatResponse(data, "PDF uploaded successfully");
-    });
+    );
 
     // Return the result outside the transaction block
     return transaction;

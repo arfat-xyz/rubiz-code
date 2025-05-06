@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import UploadTabComponent from "./upload-tab";
 import ChatTabComponent from "./chat-tab";
 import { tabValueProps } from "@/utils/interface";
@@ -27,9 +27,12 @@ const HomePageClientComponent = () => {
       </div>
 
       {/* tabs content */}
-      <div className="w-full mt-8">
+      <div className="w-full mt-8 overflow-hidden">
         {activeTab === "upload" ? (
-          <UploadTabComponent activeTab={activeTab} />
+          <UploadTabComponent
+            setActiveTab={setActiveTab}
+            activeTab={activeTab}
+          />
         ) : (
           <></>
         )}

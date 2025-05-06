@@ -1,8 +1,20 @@
 "use client";
+import {
+  frontendErrorResponse,
+  frontendSuccessResponse,
+} from "@/lib/frontend-response-toast";
 import { tabValueProps } from "@/utils/interface";
+import { useConversationStore } from "@/utils/use-conversation-zustand";
 import React, { useState, useRef, ChangeEvent } from "react";
 
-const UploadTabComponent = ({ activeTab }: { activeTab: tabValueProps }) => {
+const UploadTabComponent = ({
+  activeTab,
+  setActiveTab,
+}: {
+  activeTab: tabValueProps;
+  setActiveTab: React.Dispatch<React.SetStateAction<tabValueProps>>;
+}) => {
+  const { setConversation } = useConversationStore();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,19 +66,19 @@ const UploadTabComponent = ({ activeTab }: { activeTab: tabValueProps }) => {
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
-      });
+      }).then((res) => res.json());
 
-      if (!response.ok) {
-        throw new Error("Upload failed");
+      if (!response?.success) {
+        return frontendErrorResponse({ message: response?.message });
       }
-
-      const result = await response.json();
-      console.log("Upload successful:", result);
       // Handle successful upload (e.g., show success message, reset form)
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+
+      setConversation(response?.data);
+      return frontendSuccessResponse({ message: response?.message });
     } catch (err) {
       console.error("Upload error:", err);
       setError(
@@ -74,6 +86,9 @@ const UploadTabComponent = ({ activeTab }: { activeTab: tabValueProps }) => {
       );
     } finally {
       setIsSubmitting(false);
+      setTimeout(() => {
+        setActiveTab("chat");
+      }, 1000);
     }
   };
 

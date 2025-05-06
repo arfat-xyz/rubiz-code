@@ -21,9 +21,20 @@ const config: Config = {
           "0%": { opacity: "1" },
           "100%": { opacity: "0" },
         },
+        "bounce-loading": {
+          "0%, 100%": {
+            transform: "translateY(-85%)",
+            "animation-timing-function": "cubic-bezier(0.8, 0, 1, 1)",
+          },
+          "50%": {
+            transform: "translateY(0)",
+            "animation-timing-function": "cubic-bezier(0, 0, 0.2, 1)",
+          },
+        },
       },
       animation: {
         fadeIn: "fadeIn 0.3s ease-out forwards",
+        "bounce-loading": "bounce-loading 1s infinite",
         fadeOut: "fadeOut 0.3s ease-out forwards",
       },
     },
