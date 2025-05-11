@@ -89,6 +89,7 @@ const ChatWindow = () => {
 
             try {
               const parsed = JSON.parse(data);
+
               if (parsed.token) {
                 setAllConversations((prev) => {
                   const lastIndex = prev.length - 1;
@@ -109,9 +110,39 @@ const ChatWindow = () => {
                   return prev;
                 });
               }
+
               if (parsed.error) throw new Error(parsed.error);
-            } catch (e) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (e: any) {
               console.error("Error parsing chunk:", e);
+
+              let userFriendlyError = "An unexpected error occurred.";
+              const errorMessage = e?.message || "";
+
+              if (
+                errorMessage.includes("429") &&
+                errorMessage.includes("Too Many Requests")
+              ) {
+                userFriendlyError =
+                  "🚫 You've exceeded your free quota for Gemini API. Please try again later or check your billing status.";
+              } else if (
+                errorMessage.includes("quota") &&
+                errorMessage.includes("generativelanguage.googleapis.com")
+              ) {
+                userFriendlyError =
+                  "⚠️ Gemini API quota limit reached. See: https://ai.google.dev/gemini-api/docs/rate-limits";
+              } else if (errorMessage.includes("JSON")) {
+                userFriendlyError =
+                  "⚠️ Received malformed data. Please refresh and try again.";
+              }
+
+              setAllConversations((prev) => [
+                ...prev,
+                {
+                  user: "assistant",
+                  query: userFriendlyError,
+                },
+              ]);
             }
           }
         }
@@ -148,15 +179,17 @@ const ChatWindow = () => {
               const { user, query } = conversation;
               const isHuman = user === "human";
 
-              return (
+              return query.length ? (
                 <div
                   key={i}
-                  className={`max-w-[80%] shadow-lg break-words bg-white px-3 py-2 mx-3 rounded-lg ${
+                  className={`max-w-[80%] shadow-lg break-words bg-white dark:text-black dark:bg-white px-3 py-2 mx-3 rounded-lg ${
                     isHuman ? "self-end" : "self-start"
                   }`}
                 >
                   <ReactRemarkdownDataVisualComponent context={query} />
                 </div>
+              ) : (
+                <></>
               );
             })}
             <div ref={messagesEndRef} />

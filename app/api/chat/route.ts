@@ -35,12 +35,13 @@ export async function POST(request: Request) {
       try {
         const data = await createIdFilterRetriever(conversationId, message);
         const combinedText = data.map((doc) => doc.pageContent).join("\n\n");
-
         const streamingLlm = new ChatGoogleGenerativeAI({
-          model: "gemini-1.5-pro",
+          // model: "gemini-1.5-pro",
+          model: "gemini-2.5-pro-exp-03-25",
           temperature: 0.7,
-          maxOutputTokens: 1000,
+          maxOutputTokens: 200,
           streaming: true,
+          maxRetries: 2,
         });
 
         const prompt = await promptTemplate.format({

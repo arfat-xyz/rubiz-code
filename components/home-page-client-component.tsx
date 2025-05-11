@@ -27,7 +27,7 @@ const HomePageClientComponent = () => {
       </div>
 
       {/* tabs content */}
-      <div className="w-full mt-8 overflow-hidden">
+      <div className="w-full mt-8 lg:overflow-hidden">
         {activeTab === "upload" ? (
           <UploadTabComponent
             setActiveTab={setActiveTab}
