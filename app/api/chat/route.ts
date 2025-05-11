@@ -39,7 +39,7 @@ export async function POST(request: Request) {
           // model: "gemini-1.5-pro",
           model: "gemini-2.5-pro-exp-03-25",
           temperature: 0.7,
-          maxOutputTokens: 100,
+          maxOutputTokens: 1000,
           streaming: true,
         });
 

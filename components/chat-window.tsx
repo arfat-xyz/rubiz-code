@@ -179,7 +179,7 @@ const ChatWindow = () => {
               const { user, query } = conversation;
               const isHuman = user === "human";
 
-              return query.length ? (
+              return (
                 <div
                   key={i}
                   className={`max-w-[80%] shadow-lg break-words bg-white dark:text-black dark:bg-white px-3 py-2 mx-3 rounded-lg ${
@@ -188,8 +188,6 @@ const ChatWindow = () => {
                 >
                   <ReactRemarkdownDataVisualComponent context={query} />
                 </div>
-              ) : (
-                <></>
               );
             })}
             <div ref={messagesEndRef} />
