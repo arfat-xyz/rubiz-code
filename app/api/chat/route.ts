@@ -39,9 +39,8 @@ export async function POST(request: Request) {
           // model: "gemini-1.5-pro",
           model: "gemini-2.5-pro-exp-03-25",
           temperature: 0.7,
-          maxOutputTokens: 200,
+          maxOutputTokens: 100,
           streaming: true,
-          maxRetries: 2,
         });
 
         const prompt = await promptTemplate.format({
